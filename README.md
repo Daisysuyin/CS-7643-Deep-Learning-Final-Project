@@ -63,6 +63,7 @@ cs7643_project_quantum_transformer/
 │
 ├── README.md
 ├── environment.yml
+├── requirement.txt
 └── requirements-checkpoint.ipynb         # metadata autosave from Jupyter
 
 ```
