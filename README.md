@@ -8,28 +8,64 @@ The full implementation includes classical CNN and ViT baselines, hybrid models 
 ---
 
 ## 📁 Project Structure
-cs7643_project/
+``` 
+cs7643_project_quantum_transformer/
+│
+├── .vscode/
+│   └── settings.json
+│
+├── __pycache__/                        # Python cache files
+│
+├── checkpoints/
+│   ├── classical_cnn_best.pt
+│   ├── classical_cnn_last.pt
+│   ├── classical_vit_best.pt
+│   ├── classical_vit_last.pt
+│   ├── hybrid_cnn_best.pt
+│   ├── hybrid_cnn_last.pt
+│   ├── hybrid_vit_best.pt
+│   ├── hybrid_vit_last.pt
+│   ├── quantum_vit_qattn_best.pt
+│   └── quantum_vit_qattn_last.pt
+│
+├── results/
+│   ├── classical_cnn.csv
+│   ├── classical_vit.csv
+│   ├── hybrid_cnn.csv
+│   ├── hybrid_vit.csv
+│   ├── quantum_vit_qattn.csv
+│   └── logs/                           # additional structured logs
+│
+├── figures/
+│   ├── loss_curves.png
+│   └── val_accuracy.png
+│
+├── configs/
+│   ├── classical_cnn_config.json
+│   ├── classical_vit_config.json
+│   ├── hybrid_cnn_config.json
+│   ├── hybrid_vit_config.json
+│   └── quantum_vit_qattn_config.json
 │
 ├── src/
-│ ├── models.py # CNN, ViT, VQC-head, Quantum-ViT
-│ ├── quantum_head.py # Variational quantum circuit (VQC) module
-│ ├── quantum_attention.py # CUDA-Q quantum self-attention kernel
-│ ├── data_utils.py # Dataset loading + preprocessing
-│ ├── train_classical.py # Training script for CNN + ViT
-│ ├── train_hybrid.py # Training script for CNN/ViT + VQC head
-│ ├── train_quantum_vit.py # Training script for Quantum Transformer
-│ └── utils.py # Logging, plotting, checkpoint helpers
+│   ├── data_utils.py
+│   ├── models.py
+│   ├── quantum_attention.py
+│   ├── quantum_head.py
+│   ├── train_classical.py
+│   ├── train_hybrid.py
+│   ├── train_quantum_vit.py
+│   └── utils.py
 │
 ├── notebooks/
-│ └── run_experiments.ipynb # Unified notebook for running all experiments
+│   ├── run_all_experiments.ipynb
+│   └── checkpoint_analysis.ipynb
 │
-├── results/ # CSV logs for losses, accuracies
-├── checkpoints/ # Saved model weights (best + last)
-├── figures/ # Loss curves, accuracy plots
-│
-├── environment.yml # Conda environment for reproducibility
-├── README.md # Project documentation
+├── README.md
+├── environment.yml
+└── requirements-checkpoint.ipynb         # metadata autosave from Jupyter
 
+```
 ---
 
 ## 🚀 Models Implemented
@@ -65,10 +101,8 @@ These models test whether quantum circuits can effectively replace classifier he
 Inspired by the official **CUDA-Q Quantum Transformer tutorial**.
 
 Replaces dot-product attention with a **quantum similarity kernel**:
+$s_{ij} = \langle \psi(x_{ij}, \theta) \mid H \mid \psi(x_{ij}, \theta) \rangle$
 
-\[
-s_{ij} = \langle \psi(x_{ij}, \theta) | H | \psi(x_{ij}, \theta) \rangle
-\]
 
 This enhances token interactions using quantum embedding, while preserving the ViT architecture.
 
@@ -94,7 +128,7 @@ This enhances token interactions using quantum embedding, while preserving the V
 | Hybrid ViT + VQC     | 10.0%        | 2.303          |
 | **Quantum-ViT (QAttn)** | **84.1%**     | **0.435**       |
 
-### Observations
+### **Observations**
 - Classical baselines remained near random-guess performance in the captured final runs.  
 - VQC classifier heads underperform due to strong information bottlenecks.  
 - **Quantum attention dramatically improves performance**, achieving 84.1% accuracy.  
@@ -105,36 +139,38 @@ This enhances token interactions using quantum embedding, while preserving the V
 ## 📈 Figures & Logs
 
 Plots are automatically generated in:
-
-figures/loss_curves.png
-figures/val_accuracy.png
-
+```
+  figures/loss_curves.png
+  figures/val_accuracy.png
+```
 Training logs (CSV) are saved in:
-
-results/*.csv
-
+```
+  results/*.csv
+```
 Checkpoints (best + last) in:
-
-checkpoints/
-
+```
+  checkpoints/
+```
 
 ---
 
 ## 🛠️ Installation
 
 ### **1. Clone the repository**
-
+```
 git clone https://github.com/<your-username>/cs7643_project.git
 cd cs7643_project
-
+```
 ### **2. Create the conda environment**
-
+```
 conda env create -f environment.yml
 conda activate cs7643_project
+```
 
-
-### **3. Verify CUDA-Q
+### **3. Verify CUDA-Q**
+```
 python -c "import cudaq; print(cudaq.__version__)"
+```
 
 ## ▶️ Running Experiments
 ### Option A — Unified Notebook
@@ -144,20 +180,17 @@ Open: run_experiments.ipynb
 
 Runs:
 
-CNN baseline
-
-ViT baseline
-
-Hybrid models
-
-Quantum Transformer
+- CNN baseline
+- ViT baseline
+- Hybrid models
+- Quantum Transformer
 
 ### Option B — Command Line
 
 Example:
-
+```
 python src/train_quantum_vit.py --epochs 3 --batch-size 32
-
+```
 ## 📚 References
 @misc{cudaqtransformer,
   author       = {{NVIDIA}},
