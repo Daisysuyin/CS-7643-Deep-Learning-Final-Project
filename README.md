@@ -9,7 +9,7 @@ The full implementation includes classical CNN and ViT baselines, hybrid models 
 
 ## 📁 Project Structure
 ``` 
-cs7643_project_quantum_transformer/
+CS-7643-Deep-Learning-Final-Project/
 │
 ├── .vscode/
 │   └── settings.json
