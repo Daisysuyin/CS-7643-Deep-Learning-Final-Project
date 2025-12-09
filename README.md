@@ -160,7 +160,7 @@ Checkpoints (best + last) in:
 
 ### **1. Clone the repository**
 ```
-git clone https://github.com/<your-username>/cs7643_project.git
+git clone https://github.com/Daisysuyin/CS-7643-Deep-Learning-Final-Project
 cd cs7643_project
 ```
 ### **2. Create the conda environment**
