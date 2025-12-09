@@ -61,6 +61,7 @@ cs7643_project_quantum_transformer/
 │   ├── run_all_experiments.ipynb
 │   └── checkpoint_analysis.ipynb
 │
+├── CS7643_project_report.pdf
 ├── README.md
 ├── environment.yml
 ├── requirement.txt
