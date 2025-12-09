@@ -1,0 +1,8 @@
+{
+    "name": "classical_vit",
+    "model_type": "classical",
+    "backbone": "vit",
+    "epochs": 5,
+    "batch_size": 64,
+    "lr": 0.001
+}

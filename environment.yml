@@ -1,0 +1,19 @@
+name: cs7643_project
+channels:
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - matplotlib
+  - tqdm
+  - pip:
+      - torch
+      - torchvision
+      - cudaq
+      - jupyterlab
+      - jupyter
+      - notebook
+

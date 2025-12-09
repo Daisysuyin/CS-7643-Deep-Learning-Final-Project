@@ -1,0 +1,8 @@
+{
+    "name": "hybrid_vit",
+    "model_type": "hybrid",
+    "backbone": "vit",
+    "epochs": 3,
+    "batch_size": 32,
+    "lr": 0.001
+}
