@@ -1,0 +1,19 @@
+name: Source and recorded artifacts
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax-check Python sources (no CUDA-Q dependency)
+        run: python -m compileall -q src scripts
+      - name: Validate historical results and configs
+        run: python scripts/check_artifacts.py
