@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+.env
+*.log.tmp
+.DS_Store
+# Historical datasets/checkpoints already tracked remain in Git history.

@@ -1,217 +1,82 @@
-# 🧠⚛️ Hybrid Quantum–Classical Vision Models with CUDA-Q  
-**CS 7643: Deep Learning — Final Project**
+# Hybrid Quantum-Classical Vision Models (CUDA-Q)
 
-This project explores whether structured quantum components can enhance image-classification performance when integrated into modern deep-learning architectures. The study evaluates several classical and hybrid models on the Fashion-MNIST dataset, including a CUDA-Q–based Quantum Transformer that replaces dot-product attention with a quantum similarity kernel.
+**Georgia Tech CS 7643 — Deep Learning final project**
 
-The full implementation includes classical CNN and ViT baselines, hybrid models with variational quantum circuits (VQCs), and a Quantum Vision Transformer (Quantum-ViT) using simulated quantum self-attention. All experiments, logs, checkpoints, and generated plots are included for full reproducibility.
+A research-style comparison of classical CNN / ViT baselines, hybrid variational quantum circuit (VQC) models, and a quantum-attention vision transformer on Fashion-MNIST. The project combines PyTorch with NVIDIA CUDA-Q simulation.
 
----
+> **Important evaluation caveat:** The original training scripts call Fashion-MNIST's official `test` split the "validation" loader and evaluate it during model selection. Therefore reported "validation accuracy" is **not an unbiased held-out test estimate**. This repo preserves the historical results; a separate validation split and final untouched test evaluation are needed before making generalization claims. The near-random classical baseline results also require investigation before any claim of quantum advantage.
 
-## 📁 Project Structure
-``` 
-CS-7643-Deep-Learning-Final-Project/
-│
-├── .vscode/
-│   └── settings.json
-│
-├── __pycache__/                        # Python cache files
-│
-├── checkpoints/
-│   ├── classical_cnn_best.pt
-│   ├── classical_cnn_last.pt
-│   ├── classical_vit_best.pt
-│   ├── classical_vit_last.pt
-│   ├── hybrid_cnn_best.pt
-│   ├── hybrid_cnn_last.pt
-│   ├── hybrid_vit_best.pt
-│   ├── hybrid_vit_last.pt
-│   ├── quantum_vit_qattn_best.pt
-│   └── quantum_vit_qattn_last.pt
-│
-├── results/
-│   ├── classical_cnn.csv
-│   ├── classical_vit.csv
-│   ├── hybrid_cnn.csv
-│   ├── hybrid_vit.csv
-│   ├── quantum_vit_qattn.csv
-│   └── logs/                           # additional structured logs
-│
-├── figures/
-│   ├── loss_curves.png
-│   └── val_accuracy.png
-│
-├── configs/
-│   ├── classical_cnn_config.json
-│   ├── classical_vit_config.json
-│   ├── hybrid_cnn_config.json
-│   ├── hybrid_vit_config.json
-│   └── quantum_vit_qattn_config.json
-│
-├── src/
-│   ├── data_utils.py
-│   ├── models.py
-│   ├── quantum_attention.py
-│   ├── quantum_head.py
-│   ├── train_classical.py
-│   ├── train_hybrid.py
-│   ├── train_quantum_vit.py
-│   └── utils.py
-│
-├── notebooks/
-│   ├── run_all_experiments.ipynb
-│   └── checkpoint_analysis.ipynb
-│
-├── CS7643_project_report.pdf
-├── README.md
-├── environment.yml
-├── requirement.txt
-└── requirements-checkpoint.ipynb         # metadata autosave from Jupyter
+## Results from the committed experiment logs
 
-```
----
+These are historical values read from `results/*.csv`, not newly rerun benchmarks.
 
-## 🚀 Models Implemented
+| Experiment | Best reported accuracy | Epochs logged |
+| --- | ---: | ---: |
+| Classical CNN | 10.0% | 5 |
+| Classical ViT | 10.0% | 5 |
+| Hybrid CNN + VQC | 16.4% | 3 |
+| Hybrid ViT + VQC | 10.0% | 3 |
+| Quantum-ViT (quantum attention) | **84.1%** | 3 |
 
-### **1. Classical Baselines**
-- **CNN**: Two convolutional blocks + MLP head  
-- **Vision Transformer (ViT)**:
-  - Patch size 7×7 → 16 tokens  
-  - 2 Transformer encoder layers  
-  - 64-dim token embeddings  
+The 84.1% figure is the best accuracy in `results/quantum_vit_qattn.csv` under the **original experimental protocol**. These results do **not** demonstrate superiority over a properly tuned classical ViT. The model comparisons need controlled training budgets, seeds, and a held-out test set.
 
----
+![Validation accuracy logged for each experiment](figures/val_accuracy.png)
 
-### **2. Hybrid Models with Variational Quantum Circuits (VQC)**
+## Repository guide
 
-Implemented using **CUDA-Q** and trained end-to-end with PyTorch via the parameter-shift rule.
+| Path | Contents |
+| --- | --- |
+| `src/models.py`, `src/quantum_attention.py`, `src/quantum_head.py` | Classical and quantum-hybrid model implementations |
+| `src/train_classical.py`, `src/train_hybrid.py`, `src/train_quantum_transformer.py` | Training entrypoints |
+| `src/experiments/run_experiments.py` | Classical and hybrid experiment runner |
+| `src/experiments/plot_results.py` | Visualization of logged metrics |
+| `run_all_experiments.ipynb` | Notebook experimentation |
+| `results/*.csv`, `results/*_config.json` | Original per-epoch metrics and configurations |
+| `logs/`, `checkpoints/`, `figures/` | Original logs, checkpoints, and visualizations |
+| `CS7643_project_report.pdf` | Original course project report |
 
-- Hybrid CNN + VQC  
-- Hybrid ViT + VQC  
+The dataset is included under `data/FashionMNIST/` in the current repository. In future revisions it should be downloaded on demand rather than committed as large files. Python `__pycache__` artifacts are also already tracked; `.gitignore` prevents new files but does not delete historical objects.
 
-Each VQC uses:
-- 4 qubits  
-- 2 layers  
-- Ring entanglement  
-- Expectation value over \( H = \sum_i Z_i \)
+## Environment
 
-These models test whether quantum circuits can effectively replace classifier heads.
+An NVIDIA-compatible setup with PyTorch and CUDA-Q is needed for the quantum models. CUDA-Q and PyTorch versions, GPU architecture, and platform affect reproducibility. The environment file provides a starting point, **not a locked environment**.
 
----
-
-### **3. Quantum Transformer (Quantum-ViT)**
-
-Inspired by the official **CUDA-Q Quantum Transformer tutorial**.
-
-Replaces dot-product attention with a **quantum similarity kernel**:
-$s_{ij} = \langle \psi(x_{ij}, \theta) \mid H \mid \psi(x_{ij}, \theta) \rangle$
-
-
-This enhances token interactions using quantum embedding, while preserving the ViT architecture.
-
----
-
-## 📊 Experimental Results
-
-### **Dataset**
-- Fashion-MNIST (28×28 grayscale, 60k/10k split)
-
-### **Hardware**
-- NVIDIA RTX 5090  
-- CUDA-Q 0.13.0  
-- PyTorch 2.9.1  
-
-### **Validation Results**
-
-| Model                 | Best Val Acc | Best Val Loss |
-|----------------------|--------------|----------------|
-| Classical CNN        | 10.0%        | 2.303          |
-| Classical ViT        | 10.0%        | 2.303          |
-| Hybrid CNN + VQC     | 16.4%        | 2.295          |
-| Hybrid ViT + VQC     | 10.0%        | 2.303          |
-| **Quantum-ViT (QAttn)** | **84.1%**     | **0.435**       |
-
-### **Observations**
-- Classical baselines remained near random-guess performance in the captured final runs.  
-- VQC classifier heads underperform due to strong information bottlenecks.  
-- **Quantum attention dramatically improves performance**, achieving 84.1% accuracy.  
-- Results indicate that quantum modules are more effective inside attention mechanisms than as classifiers.
-
----
-
-## 📈 Figures & Logs
-
-Plots are automatically generated in:
-```
-  figures/loss_curves.png
-  figures/val_accuracy.png
-```
-Training logs (CSV) are saved in:
-```
-  results/*.csv
-```
-Checkpoints (best + last) in:
-```
-  checkpoints/
-```
-
----
-
-## 🛠️ Installation
-
-### **1. Clone the repository**
-```
-git clone https://github.com/Daisysuyin/CS-7643-Deep-Learning-Final-Project
-```
-### **2. Create the conda environment**
-```
+```bash
 conda env create -f environment.yml
 conda activate cs7643_project
+python -c "import torch, cudaq; print(torch.__version__, cudaq.__version__)"
 ```
 
-### **3. Verify CUDA-Q**
+### Run from the expected working directory
+
+The training scripts use local imports and relative data/output paths. Run them **from `src/`**:
+
+```bash
+cd src
+python train_quantum_transformer.py --epochs 3 --batch_size 32
 ```
-python -c "import cudaq; print(cudaq.__version__)"
+
+By default, the script writes logs/results/checkpoints to `../logs`, `../results`, and `../checkpoints`. For classical / hybrid experiments, review `src/experiments/run_experiments.py` and the notebook before starting any potentially long GPU workloads. The original artifacts are already provided, so rerunning is optional.
+
+### Run lightweight repository checks (no GPU required)
+
+```bash
+python scripts/check_artifacts.py
+python -m compileall -q src
 ```
 
-## ▶️ Running Experiments
-### Option A — Unified Notebook
+CI checks source syntax and the structure of recorded result files. It does **not** train models, run CUDA-Q on hardware, reproduce accuracy, or validate scientific conclusions.
 
-Open: run_experiments.ipynb
+## Evaluation improvements needed
 
+1. Split the original 60,000 Fashion-MNIST training examples into training and validation subsets. Hold the official 10,000-example test split untouched until model selection is complete.
+2. Debug classical baselines that stay around 10% before drawing conclusions from hybrid variants.
+3. Use identical splits, comparable training budgets, seeds, data transforms, and model size reporting.
+4. Repeat independent runs with confidence intervals and report compute cost and elapsed time.
+5. Provide a fresh final test result and full environment metadata.
 
-Runs:
+## Citation and inspiration
 
-- CNN baseline
-- ViT baseline
-- Hybrid models
-- Quantum Transformer
-
-### Option B — Command Line
-
-Example:
-```
-python src/train_quantum_vit.py --epochs 3 --batch-size 32
-```
-## 📚 References
-@misc{cudaqtransformer,
-  author       = {{NVIDIA}},
-  title        = {{CUDA-Q} Quantum Transformer Tutorial},
-  howpublished = {\url{https://nvidia.github.io/cuda-quantum/latest/applications/python/quantum_transformer.html}},
-  year         = {2024}
-}
-
-@article{gebru2018datasheets,
-  title={Datasheets for Datasets},
-  author={Gebru, Timnit and Morgenstern, Jamie and Vecchione, Briana and others},
-  journal={Communications of the ACM},
-  year={2021}
-}
-
-@article{schuld2021quantumkernels,
-  title={Supervised Quantum Machine Learning Models Are Kernel Methods},
-  author={Schuld, Maria},
-  journal={Quantum},
-  year={2021}
-}
-
-
+- [NVIDIA CUDA-Q Quantum Transformer tutorial](https://nvidia.github.io/cuda-quantum/latest/applications/python/quantum_transformer.html)
+- [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist)
+- See the original `CS7643_project_report.pdf` for course-context details.
